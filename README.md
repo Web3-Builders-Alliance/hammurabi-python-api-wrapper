@@ -1,1 +1,2 @@
-# hammurabi-python-api-wrapper
+# Hammurabi Python API Wrapper
+
