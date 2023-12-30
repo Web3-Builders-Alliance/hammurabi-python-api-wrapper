@@ -1,11 +1,19 @@
 # Hammurabi Python API Wrapper
 
+This repository hosts an API wrapper for a comprehensive database of transaction data for the SOL-USDC pool on Orca, one of the leading decentralized exchanges on the Solana blockchain. The dataset includes detailed information on each transaction, providing valuable insights for traders, analysts, and enthusiasts.
+
+The eventual aim is to expand the database to feature comprehensive coverage of Orca liquidity pool data and eventually provide coverage of additional decentralized exchanges on Solana such as Raydium. However the database is still a work in progress. The API wrapper serves as an easy way for end users to access this database, making DeFi data on Solana more accessible. 
+
 ## Routes 
 **Raw Transactions**
 
 **Prices**
 
 **Metadata**
+
+**Create API Key**
+
+**Update Tier**
 
 ## Credit System 
 
@@ -36,7 +44,7 @@ To report a bug or submit a feature request, please use the issues tab to open a
 ## Donations
 Any donations are greatly appreciated and will be put torwards development costs. Extra donations will likely be used to buy the dev a coffee or a beer.
 
-Solana address: 2L6j3wZXEByg8jycytabZitDh9VVMhKiMYv7EeJh6R2H
+Solana address: EJXeG1MjjKr6dCkvdZfdFr4EtYo7XCciMKh8oynLTQis
 
 ## License 
 This project is licensed under the MIT License - see the LICENSE file for details.
