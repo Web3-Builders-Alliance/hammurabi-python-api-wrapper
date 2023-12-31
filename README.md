@@ -32,7 +32,7 @@ Response:
     "new_api_key": "4uTLDK0H5CyxbsHtPTUNgA",
     "tier": "free"
     }
-  ```
+
   - **401 Unauthorized:** Incorrect or missing authentication credentials
 
 **Change API Key Tier**
