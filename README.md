@@ -7,13 +7,49 @@ The eventual aim is to expand the database to feature comprehensive coverage of 
 ## Routes 
 **Raw Transactions**
 
+
+
 **Prices**
+
+
 
 **Metadata**
 
-**Create API Key**
 
-**Update Tier**
+
+**Generate API Key**
+
+Endpoint: ```/generate_api_key```
+Method: POST 
+Headers: 
+  - **Authorization:** Basic Auth (username and password)
+Parameters:
+  - **tier:** The tier of the API key (optional, defaults to free). Can be 'free', 'builder', or 'pro'.
+Response:
+  - **200 OK:** Successfully generates the API key
+    ```
+    {
+    "new_api_key": "4uTLDK0H5CyxbsHtPTUNgA",
+    "tier": "free"
+    }
+  ```
+  - **401 Unauthorized:** Incorrect or missing authentication credentials
+
+**Change API Key Tier**
+
+Endpoint: ```/change_tier```
+Method: POST
+Headers:
+  - **Authorization:** Basic Auth (username and password)
+  - **Content-Type:** application/json
+Body (json):
+  - **api_key:** The API key to change the tier of
+  - **new_tier:** The new tier to assign to the API key
+Response:
+  - **200 OK:** Successfully changed the tier of the API key
+  - **400 Bad Request:** Invalid tier specified
+  - **401 Unauthorized:** Incorrect or missing authentication credentials
+  - **404 Not Found:** API key not found
 
 ## Credit System 
 
