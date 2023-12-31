@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from config import TIER_INFO
 from auth import authenticate
-from r2_bucket import get_api_key_data
+from r2_bucket import get_api_key_data, save_api_key_data
 
 change_tier_bp = Blueprint('change_tier', __name__)
 
@@ -12,8 +12,13 @@ def change_tier():
     if not auth or not authenticate(auth.username, auth.password):
         return jsonify({"error": "Authentication Failed"}), 401
 
-    api_key = request.json.get('api_key')
-    new_tier = request.json.get('new_tier')
+    # Check if request data is JSON
+    if not request.is_json:
+        return jsonify({"error": "Invalid JSON or Content-Type"}), 400
+
+    data = request.get_json()
+    api_key = data.get('api_key')
+    new_tier = data.get('new_tier')
 
     # Validate new tier
     if new_tier not in TIER_INFO:
@@ -26,6 +31,10 @@ def change_tier():
 
     api_key_data['tier'] = new_tier
     api_key_data['monthly_credits'] = TIER_INFO[new_tier]['monthly_credits']
-    # Resetting credits and call count might be necessary depending on your business logic
     api_key_data['used_credits'] = 0
     api_key_data['call_count'] = 0
+
+    # Save the updated data
+    save_api_key_data(api_key, api_key_data)
+    
+    return jsonify({"message": f"API key tier changed to {new_tier}"}), 200

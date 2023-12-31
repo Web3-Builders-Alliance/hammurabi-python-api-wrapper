@@ -1,5 +1,5 @@
 # File: routes/generate_key.py
-from flask import request, jsonify
+from flask import Blueprint, request, jsonify
 from config import TIER_INFO
 from r2_bucket import save_api_key_data
 from auth import authenticate
@@ -8,6 +8,9 @@ import secrets
 def generate_api_key(tier="free"):
     return secrets.token_urlsafe(16)
 
+generate_key_bp = Blueprint('generate_key_bp', __name__)
+
+@generate_key_bp.route('/generate_api_key', methods=['POST'])
 def generate_key():
     auth = request.authorization
     if not auth or not authenticate(auth.username, auth.password):
