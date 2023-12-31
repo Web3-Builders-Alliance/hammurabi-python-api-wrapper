@@ -7,11 +7,11 @@ The eventual aim is to expand the database to feature comprehensive coverage of 
 ## Routes 
 **Raw Transactions**
 
-*Endpoint: ```/raw_transactions```
-*Method: GET
-*Headers: 
+-Endpoint: ```/raw_transactions```
+-Method: GET
+-Headers: 
     - **API-Key:** The API key for authorization
-*Response:
+-Response:
     - **200 OK:** Successfully retrieved price data
     - **401 Unauthorized:** Incorrect or missing API key
     - **403 Forbidden:** Monthly credit limit exceeded or rate limit exceeded. 
