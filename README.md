@@ -7,67 +7,74 @@ The eventual aim is to expand the database to feature comprehensive coverage of 
 ## Routes 
 **Raw Transactions**
 
--Endpoint: ```/raw_transactions```
--Method: GET
--Headers: 
+- Endpoint: `/raw_transactions`
+- Method: GET
+- Headers: 
     - **API-Key:** The API key for authorization
--Response:
+- Response:
     - **200 OK:** Successfully retrieved price data
     - **401 Unauthorized:** Incorrect or missing API key
-    - **403 Forbidden:** Monthly credit limit exceeded or rate limit exceeded. 
-
+    - **403 Forbidden:** Monthly credit limit exceeded or rate limit exceeded.
+  
 **Prices**
 
-*Endpoint: ```/prices```
-*Method: GET
-*Headers: 
+- Endpoint: `/prices`
+- Method: GET
+- Headers: 
     - **API-Key:** The API key for authorization
-*Response:
+- Response:
     - **200 OK:** Successfully retrieved price data
     - **401 Unauthorized:** Incorrect or missing API key
-    - **403 Forbidden:** Monthly credit limit exceeded or rate limit exceeded. 
+    - **403 Forbidden:** Monthly credit limit exceeded or rate limit exceeded.
 
 **Metadata**
 
-*Endpoint: ```/metadata```
-*Method: GET
-*Headers: 
+- Endpoint: `/metadata`
+- Method: GET
+- Headers: 
     - **API-Key:** The API key for authorization
-*Response:
-    - **200 OK:** Successfully retrieved price data
+- Response:
+    - **200 OK:** Successfully retrieved metadata
     - **401 Unauthorized:** Incorrect or missing API key
-    - **403 Forbidden:** Monthly credit limit exceeded or rate limit exceeded. 
+    - **403 Forbidden:** Monthly credit limit exceeded or rate limit exceeded.
 
 **Generate API Key**
 
-*Endpoint: ```/generate_api_key```
-*Method: POST 
-*Headers: 
+- Endpoint: `/generate_api_key`
+- Method: POST 
+- Headers: 
     - **Authorization:** Basic Auth (username and password)
-*Parameters:
-    - **tier:** The tier of the API key (optional, defaults to free). Can be 'free', 'builder', or 'pro'.
-*Response:
+- Parameters:
+    - **tier:** The tier of the API key (optional, defaults to 'free'). Can be 'free', 'builder', or 'pro'.
+- Response:
     - **200 OK:** Successfully generates the API key
-    ```
-    {
-    "new_api_key": "4uTLDK0H5CyxbsHtPTUNgA",
-    "tier": "free"
-    }
-
+      ```
+      {
+        "new_api_key": "4uTLDK0H5CyxbsHtPTUNgA",
+        "tier": "free"
+      }
+      ```
     - **401 Unauthorized:** Incorrect or missing authentication credentials
 
 **Change API Key Tier**
 
-*Endpoint: ```/change_tier```
-*Method: POST
-*Headers:
+- Endpoint: `/change_tier`
+- Method: POST
+- Headers:
     - **Authorization:** Basic Auth (username and password)
     - **Content-Type:** application/json
-*Body (json):
+- Body (json):
     - **api_key:** The API key to change the tier of
     - **new_tier:** The new tier to assign to the API key
-*Response:
+
+		```
+	  {
+	    		"api_key": "4uTLDK0H5CyxbsHtPTUNgA",
+	    		"new_tier": "pro"
+		}
+- Response:
     - **200 OK:** Successfully changed the tier of the API key
+      ```{ "message": "API key tier changed to pro" }```
     - **400 Bad Request:** Invalid tier specified
     - **401 Unauthorized:** Incorrect or missing authentication credentials
     - **404 Not Found:** API key not found
