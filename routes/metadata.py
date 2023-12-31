@@ -1,8 +1,10 @@
-from flask import request, jsonify
+from flask import Blueprint, request, jsonify
 from config import METADATA_BUCKET_NAME
 from utilities.api_key_utils import check_api_key
 
-@app.route('/metadata', methods=['GET'])
+metadata_bp = Blueprint('metadata_bp', __name__)
+
+@metadata_bp.route('/metadata', methods=['GET'])
 def metadata_files():
     api_key = request.headers.get('API-Key')
     error = check_api_key(api_key)

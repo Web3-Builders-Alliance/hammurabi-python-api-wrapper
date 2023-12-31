@@ -1,9 +1,11 @@
-from flask import request, jsonify
+from flask import Blueprint, request, jsonify
 from config import TIER_INFO
 from auth import authenticate
 from r2_bucket import get_api_key_data
 
-@app.route('/change_tier', methods=['POST'])
+change_tier_bp = Blueprint('change_tier', __name__)
+
+@change_tier_bp.route('/change_tier', methods=['POST'])
 def change_tier():
     # Authentication to ensure that only authorized users can change tiers
     auth = request.authorization

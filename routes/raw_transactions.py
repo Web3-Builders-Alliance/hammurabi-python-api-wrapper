@@ -1,9 +1,11 @@
 # File: routes/generate_key.py
-from flask import request, jsonify
+from flask import Blueprint, request, jsonify
 from config import BUCKET_NAME
 from utilities.api_key_utils import check_api_key
 
-@app.route('/raw_transactions', methods=['GET'])
+raw_transactions_bp = Blueprint('raw_transactions_bp', __name__)
+
+@raw_transactions_bp.route('/raw_transactions', methods=['GET'])
 def raw_transaction_files():
     api_key = request.headers.get('API-Key')
     error = check_api_key(api_key)
