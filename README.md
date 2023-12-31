@@ -7,25 +7,46 @@ The eventual aim is to expand the database to feature comprehensive coverage of 
 ## Routes 
 **Raw Transactions**
 
-
+*Endpoint: ```/raw_transactions```
+*Method: GET
+*Headers: 
+  - **API-Key:** The API key for authorization
+*Response:
+  - **200 OK:** Successfully retrieved price data
+  - **401 Unauthorized:** Incorrect or missing API key
+  - **403 Forbidden:** Monthly credit limit exceeded or rate limit exceeded. 
 
 **Prices**
 
-
+*Endpoint: ```/prices```
+*Method: GET
+*Headers: 
+  - **API-Key:** The API key for authorization
+*Response:
+  - **200 OK:** Successfully retrieved price data
+  - **401 Unauthorized:** Incorrect or missing API key
+  - **403 Forbidden:** Monthly credit limit exceeded or rate limit exceeded. 
 
 **Metadata**
 
-
+*Endpoint: ```/metadata```
+*Method: GET
+*Headers: 
+  - **API-Key:** The API key for authorization
+*Response:
+  - **200 OK:** Successfully retrieved price data
+  - **401 Unauthorized:** Incorrect or missing API key
+  - **403 Forbidden:** Monthly credit limit exceeded or rate limit exceeded. 
 
 **Generate API Key**
 
-Endpoint: ```/generate_api_key```
-Method: POST 
-Headers: 
+*Endpoint: ```/generate_api_key```
+*Method: POST 
+*Headers: 
   - **Authorization:** Basic Auth (username and password)
-Parameters:
+*Parameters:
   - **tier:** The tier of the API key (optional, defaults to free). Can be 'free', 'builder', or 'pro'.
-Response:
+*Response:
   - **200 OK:** Successfully generates the API key
     ```
     {
@@ -37,15 +58,15 @@ Response:
 
 **Change API Key Tier**
 
-Endpoint: ```/change_tier```
-Method: POST
-Headers:
+*Endpoint: ```/change_tier```
+*Method: POST
+*Headers:
   - **Authorization:** Basic Auth (username and password)
   - **Content-Type:** application/json
-Body (json):
+*Body (json):
   - **api_key:** The API key to change the tier of
   - **new_tier:** The new tier to assign to the API key
-Response:
+*Response:
   - **200 OK:** Successfully changed the tier of the API key
   - **400 Bad Request:** Invalid tier specified
   - **401 Unauthorized:** Incorrect or missing authentication credentials
