@@ -114,6 +114,32 @@ The eventual aim is to expand the database to feature comprehensive coverage of 
 - 5m call credits per month
 - 500 calls / min
 
+## Integrating Into Code
+
+The code below demonstrates how to call the API in Python. It is important to note that you must either be running the API locally and have access to your own database or reach out to me for a key. As this is an early stage API, there is no web interface in which a user can generate their own key yet. 
+
+```
+import requests
+
+def get_api_data(endpoint, api_key=None):
+    url = f"http://localhost:5000/{endpoint}"  # Change to the hosted API URL if not running locally
+    headers = {"API-Key": api_key} if api_key else {}
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        print(f"Error making request: {e}")
+        return None
+
+# Example usage
+endpoint = 'raw_transactions'  # Can be 'raw_transactions', 'prices', etc.
+api_key = 'your_api_key_here'  # Only needed for hosted API, omit for local API
+data = get_api_data(endpoint, api_key)
+print(data)
+```
+
 ## Running On Local Machine 
 
 Accessing the data on your local machine involves several steps. Whether you prefer postman or cURL, the first steps is the same. Ensure that you have Python version 3.9 and the dependencies specified within the requirements.txt file installed. Then, run the application using the following command: 
