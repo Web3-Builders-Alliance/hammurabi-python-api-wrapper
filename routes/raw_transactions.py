@@ -4,6 +4,7 @@ from utilities.api_key_utils import check_api_key
 from r2_bucket import r2_client_transaction
 from botocore.exceptions import ClientError
 import logging
+import json
 
 raw_transactions_bp = Blueprint('raw_transactions_bp', __name__)
 
@@ -24,7 +25,13 @@ def raw_transaction_files():
         for obj in all_objects:
             object_content = r2_client_transaction.get_object(Bucket='orca-sol-usdc', Key=obj['Key'])
             content = object_content['Body'].read().decode('utf-8')
-            transaction_data[obj['Key']] = content
+            try: 
+                parsed_content = json.loads(content)
+            except json.JSONDecodeError: 
+                logging.error(f"Error parsing JSON content from object")
+                parsed_content = content
+            
+            transaction_data[obj['Key']] = parsed_content
 
         logging.info("All transaction data retrieved successfully.")
         return jsonify({"transactions": transaction_data}), 200

@@ -3,6 +3,7 @@ from utilities.api_key_utils import check_api_key
 from r2_bucket import r2_client_metadata
 from botocore.exceptions import ClientError
 import logging
+import json
 
 metadata_bp = Blueprint('metadata_bp', __name__)
 
@@ -19,9 +20,15 @@ def metadata_files():
         object_key = "token_metadata.json"
         response = r2_client_metadata.get_object(Bucket='token-metadata', Key=object_key)
         content = response['Body'].read().decode('utf-8')
+        try: 
+            parsed_content = json.loads(content)
+        except json.JSONDecodeError: 
+            logging.error(f"Error parsing JSON content from object")
+            parsed_content = content
+
         logging.info(f"Contents of object '{object_key}' retrieved.")
 
-        return jsonify({"content": content}), 200
+        return jsonify({"content": parsed_content}), 200
 
     except ClientError as e:
         logging.error(f"ClientError in retrieving object: {e}")
