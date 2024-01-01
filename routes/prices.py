@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify
-from config import METADATA_BUCKET_NAME
+from config import PRICE_BUCKET_NAME
 from utilities.api_key_utils import check_api_key
 from r2_bucket import r2_client_metadata
+from botocore.exceptions import ClientError
 import logging
 
 prices_bp = Blueprint('prices_bp', __name__)
@@ -16,14 +17,22 @@ def price_files():
         return jsonify({"error": error_message}), status_code
 
     try:
-        print(r2_client_metadata)
-        response = r2_client_metadata.list_objects_v2(Bucket=METADATA_BUCKET_NAME, Prefix='token-price/')
-        logging.info(f"R2 Bucket Response:{response}")
-        file_list = []
-        if 'Contents' in response:
-            file_list = [obj['Key'] for obj in response['Contents'] if isinstance(obj['Key'], str)]
-        logging.info(f"Metadata Files Retrieved: {file_list}")
-        return jsonify({"files": file_list}), 200
+        response = r2_client_metadata.list_objects_v2(Bucket='token-price')
+        all_objects = response.get('Contents', [])
+        prices_data = {}
+
+        for obj in all_objects:
+            object_content = r2_client_metadata.get_object(Bucket='token-price', Key=obj['Key'])
+            content = object_content['Body'].read().decode('utf-8')
+            prices_data[obj['Key']] = content
+
+        logging.info("All prices data retrieved successfully.")
+        return jsonify({"prices": prices_data}), 200
+
+    except ClientError as e:
+        logging.error(f"ClientError in retrieving objects: {e}")
+        return jsonify({"error": str(e)}), 500
+
     except Exception as e:
-        logging.error(f"Error Retrieving Metadata: {str(e)}")
-        return jsonify({"error": str(e)})
+        logging.error(f"Unhandled Error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
