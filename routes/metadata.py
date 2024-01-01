@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-from config import METADATA_BUCKET_NAME
 from utilities.api_key_utils import check_api_key
 from r2_bucket import r2_client_metadata
 from botocore.exceptions import ClientError
@@ -17,15 +16,15 @@ def metadata_files():
         return jsonify({"error": error_message}), status_code
 
     try:
-        # List all objects in the bucket
-        response = r2_client_metadata.get_object(Bucket='token-metadata', Key=f"token_metadata.json")
-        all_keys = [obj['Key'] for obj in response.get('Contents', [])]
-        logging.info(f"All keys in the bucket: {all_keys}")
+        object_key = "token_metadata.json"
+        response = r2_client_metadata.get_object(Bucket='token-metadata', Key=object_key)
+        content = response['Body'].read().decode('utf-8')
+        logging.info(f"Contents of object '{object_key}' retrieved.")
 
-        return jsonify({"keys": all_keys}), 200
+        return jsonify({"content": content}), 200
 
     except ClientError as e:
-        logging.error(f"ClientError in listing objects: {e}")
+        logging.error(f"ClientError in retrieving object: {e}")
         return jsonify({"error": str(e)}), 500
 
     except Exception as e:
