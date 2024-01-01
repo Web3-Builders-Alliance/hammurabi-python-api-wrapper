@@ -79,6 +79,27 @@ The eventual aim is to expand the database to feature comprehensive coverage of 
     - **401 Unauthorized:** Incorrect or missing authentication credentials
     - **404 Not Found:** API key not found
 
+**Whitelist API Key**
+- Endpoint: `/toggle_whitelist`
+- Method: POST 
+- Authentication: Basic Auth (username and password)
+- Headers: 
+    - **Authorization:** Basic Auth (username and password)
+    - **Content-Type:** application/json
+- Request Body (json)
+    - **api_key:** The API key for which the whitelist status needs to be toggled
+- Reponse: 
+    - **200 OK:** Successfully toggled the whitelist status of the API key
+    ```
+    {
+        "message": "API key 'mx_fkEO3Rt4L16ZlSdYkJg' whitelisting toggled",
+        "whitelisted": true
+    }
+    ```
+    - **401 Unauthorized:** Authentication failed due to incorrect or missing credentials 
+    - **400 Bad Request:** The request is missing the required api_key parameter
+    - **404 Not Found:** The specified API key was not found
+
 ## Credit System 
 
 **Free**
