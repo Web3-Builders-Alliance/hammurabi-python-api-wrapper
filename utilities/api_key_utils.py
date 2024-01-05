@@ -12,6 +12,16 @@ def check_api_key(api_key):
 
     now = datetime.datetime.now(pytz.utc)
 
+    # Check for subscription expiration
+    expiration_date = datetime.datetime.fromisoformat(key_info["expiration_date"])
+    if now > expiration_date:
+        key_info['tier'] = 'free'  # Reset to free tier
+        key_info['monthly_credits'] = TIER_INFO['free']['monthly_credits']
+        key_info['used_credits'] = 0
+        key_info['expiration_date'] = (now + datetime.timedelta(days=3650)).isoformat()  # Reset expiration date
+        save_api_key_data(api_key, key_info)
+        logging.info(f"API Key Tier Reset to Free: {api_key}")
+
     if key_info["whitelisted"]:
         logging.info(f"API Key Whitelisted: {api_key}")
         return None
@@ -26,7 +36,6 @@ def check_api_key(api_key):
         key_info["last_call"] = now.isoformat()
         save_api_key_data(api_key, key_info)
         logging.info(f"API Key Credits Reset: {api_key}")
-        return None
 
     rate_limit = TIER_INFO[key_info["tier"]]["rate_limit"]
     if now - key_info["last_call"] < datetime.timedelta(seconds=RATE_LIMIT_INTERVAL):
