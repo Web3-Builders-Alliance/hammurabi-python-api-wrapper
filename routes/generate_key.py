@@ -16,10 +16,6 @@ def generate_key():
     if not auth or not authenticate(auth.username, auth.password):
         return jsonify({"error": "Authentication Failed"}), 401
 
-    solana_public_key = request.json.get('solana_public_key')
-    if len(solana_public_key) != 44:
-        return jsonify({"error": "Invalid Solana public key. It must be 44 characters long."}), 400
-
     new_key = generate_api_key()
     tier = request.args.get('tier', 'free')
     tier_info = TIER_INFO.get(tier, TIER_INFO["free"])
@@ -27,7 +23,6 @@ def generate_key():
     far_future_date = datetime.now() + timedelta(days=3650)
 
     api_key_data = {
-        "solana_public_key": solana_public_key,
         "tier": tier,
         "monthly_credits": tier_info["monthly_credits"],
         "used_credits": 0,
@@ -37,4 +32,4 @@ def generate_key():
         "expiration_date": far_future_date.isoformat()
     }
     save_api_key_data(new_key, api_key_data)
-    return jsonify({"new_api_key": new_key, "tier": tier, "solana_public_key": solana_public_key}), 200
+    return jsonify({"new_api_key": new_key, "tier": tier}), 200
