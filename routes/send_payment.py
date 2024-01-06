@@ -1,47 +1,78 @@
 from flask import Blueprint, request, jsonify
+from solana.rpc.api import Client
+from solders.keypair import Keypair
+from solders.transaction import VersionedTransaction
+from solders.system_program import TransferParams, transfer
+from solders.instruction import Instruction
+from solders.message import MessageV0
+from solders.hash import Hash
+import json
 from config import TIER_INFO
 from r2_bucket import get_api_key_data, save_api_key_data
-import secrets
-import requests
-import json
 from datetime import datetime, timedelta
 
 send_payment_bp = Blueprint('send_payment', __name__)
 
-PAYMENT_ADDRESS = "<PUBLIC_KEY>"
+# Load the payment wallet information (The wallet receiving the USDC)
+with open('./payment_wallet.json', 'r') as f:
+    payment_wallet_data = json.load(f)
+PAYMENT_WALLET = Keypair.from_bytes(payment_wallet_data)
+
+# Load the payer wallet information (The wallet sending the USDC)
+with open('./sender_wallet.json', 'r') as f: 
+    user_wallet_data = json.load(f)
+USER_WALLET = Keypair.from_bytes(user_wallet_data)
 
 @send_payment_bp.route('/send_payment', methods=['POST'])
 def create_payment_address():
+
+    client = Client("https://api.devnet.solana.com")
+    LAMPORT_PER_SOL = 1000000000
+
     data = request.get_json()
-    user_wallet_address = data.get('user_wallet_address')
+    user_wallet_address = USER_WALLET
+    payment_wallet_address = PAYMENT_WALLET
+    #airdrop = client.request_airdrop(USER_WALLET.pubkey(), 2 * LAMPORT_PER_SOL)
     token_amount = data.get('token_amount')
-    token_mint = data.get('token_mint')
-    api_key = data.get('api_key')  # Assuming the API key is sent in the request
-    transaction_id = data.get('transaction_id')  # Get the transaction ID from the request
+    api_key = data.get('api_key')  
 
-    if len(user_wallet_address) != 44: 
-        return jsonify({"error": "Invalid Solana public key. Please input a valid 44 character long key."}), 400
-    
-    if token_mint != 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v':  # USDC mint address on Solana
-        return jsonify({"error": "Invalid token mint address. Please input the correct mint address for USDC"}), 400
-    
-    # Verify the transaction
-    if not verify_transaction(transaction_id, user_wallet_address, token_amount):
-        return jsonify({"error": "Transaction verification failed. Please ensure the transaction is completed."}), 400
+    # Instructions 
+    ix = transfer(
+        TransferParams(
+            from_pubkey = user_wallet_address.pubkey(), 
+            to_pubkey = payment_wallet_address.pubkey(), 
+            lamports = int(LAMPORT_PER_SOL*token_amount)
+        )
+    )
 
-    if token_amount == 15 or token_amount == 45:
+    blockhash_response = client.get_latest_blockhash()
+    print(user_wallet_address.pubkey())
+    
+    # Send the transaction
+    msg = MessageV0.try_compile(
+        payer = user_wallet_address.pubkey(), 
+        instructions = [ix], 
+        address_lookup_table_accounts=[], 
+        recent_blockhash = blockhash_response.value.blockhash,
+    )
+
+    tx = VersionedTransaction(msg, [user_wallet_address])
+
+    client.send_transaction(tx)
+    
+    if token_amount == 0.05 or token_amount == 0.1:
         # Determine new tier and expiration date
         new_tier, expiration_date = determine_tier_and_expiration(token_amount)
         update_user_tier(api_key, new_tier, expiration_date)
-        return jsonify({"payment_address": PAYMENT_ADDRESS, "amount_due": token_amount, "new_tier": new_tier}), 200
+        return jsonify({"payment_address": str(user_wallet_address.pubkey()), "amount_due": token_amount, "new_tier": new_tier}), 200
     else:
         return jsonify({"error": "Invalid payment amount."}), 400
 
 def determine_tier_and_expiration(amount):
     expiration_date = datetime.now() + timedelta(days=30)
-    if amount == 15:
+    if amount == 0.05:
         return 'builder', expiration_date
-    elif amount == 45:
+    elif amount == 0.1:
         return 'pro', expiration_date
     else:
         return 'free', expiration_date
@@ -56,36 +87,3 @@ def update_user_tier(api_key, new_tier, expiration_date):
         api_key_data['expiration_date'] = expiration_date.isoformat() 
         save_api_key_data(api_key, api_key_data)
 
-def verify_transaction(transaction_id, wallet_address, amount):
-    rpc_url = "https://api.devnet.solana.com"
-
-    payload = json.dumps({
-        "jsonrpc": "2.0",
-        "id": 1,
-        "method": "getTransaction",
-        "params": [transaction_id, "jsonParsed"]
-    })
-
-    headers = {
-        'Content-Type': 'application/json'
-    }
-
-    try:
-        response = requests.post(rpc_url, headers=headers, data=payload)
-        response.raise_for_status()
-
-        transaction_data = response.json()
-
-        if 'error' in transaction_data: 
-            print("Transaction error:", transaction_data['error'])
-            return False 
-        
-        is_correct_sender = transaction_data['result']['meta']['postTokenBalances'][0]['owner'] == wallet_address
-        is_correct_amount = transaction_data['result']['meta']['postTokenBalances'][0]['uiTokenAmount']['amount'] == str(amount)
-        is_successful = transaction_data['result']['meta']['status']['Ok'] is not None
-
-        return is_correct_sender and is_correct_amount and is_successful
-
-    except requests.RequestException as e:
-        print(f"Error querying the Solana RPC API: {e}")
-        return False

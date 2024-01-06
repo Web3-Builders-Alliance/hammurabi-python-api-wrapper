@@ -6,6 +6,7 @@ from routes.raw_transactions import raw_transactions_bp
 from routes.prices import prices_bp
 from routes.metadata import metadata_bp
 from routes.whitelist import whitelist_bp
+from routes.send_payment import send_payment_bp
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -17,6 +18,7 @@ app.register_blueprint(metadata_bp)
 app.register_blueprint(raw_transactions_bp)
 app.register_blueprint(generate_key_bp)
 app.register_blueprint(whitelist_bp)
+app.register_blueprint(send_payment_bp)
 
 if __name__ == '__main__':
     app.run(debug=True)
