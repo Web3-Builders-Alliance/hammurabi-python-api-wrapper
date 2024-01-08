@@ -35,31 +35,32 @@ def create_payment_address():
     #airdrop = client.request_airdrop(USER_WALLET.pubkey(), 2 * LAMPORT_PER_SOL)
     token_amount = data.get('token_amount')
     api_key = data.get('api_key')  
-
-    # Instructions 
-    ix = transfer(
-        TransferParams(
-            from_pubkey = user_wallet_address.pubkey(), 
-            to_pubkey = payment_wallet_address.pubkey(), 
-            lamports = int(LAMPORT_PER_SOL*token_amount)
-        )
-    )
-
-    blockhash_response = client.get_latest_blockhash()
-    print(user_wallet_address.pubkey())
-    
-    # Send the transaction
-    msg = MessageV0.try_compile(
-        payer = user_wallet_address.pubkey(), 
-        instructions = [ix], 
-        address_lookup_table_accounts=[], 
-        recent_blockhash = blockhash_response.value.blockhash,
-    )
-
-    tx = VersionedTransaction(msg, [user_wallet_address])
     
     if token_amount == 0.05 or token_amount == 0.1:
         # Determine new tier and expiration date
+
+            # Instructions 
+        ix = transfer(
+            TransferParams(
+                from_pubkey = user_wallet_address.pubkey(), 
+                to_pubkey = payment_wallet_address.pubkey(), 
+                lamports = int(LAMPORT_PER_SOL*token_amount)
+            )
+        )
+
+        blockhash_response = client.get_latest_blockhash()
+        print(user_wallet_address.pubkey())
+        
+        # Send the transaction
+        msg = MessageV0.try_compile(
+            payer = user_wallet_address.pubkey(), 
+            instructions = [ix], 
+            address_lookup_table_accounts=[], 
+            recent_blockhash = blockhash_response.value.blockhash,
+        )
+
+        tx = VersionedTransaction(msg, [user_wallet_address])
+
         client.send_transaction(tx)
         new_tier, expiration_date = determine_tier_and_expiration(token_amount)
         update_user_tier(api_key, new_tier, expiration_date)
