@@ -15,6 +15,18 @@ The eventual aim is to expand the database to feature comprehensive coverage of 
     - **200 OK:** Successfully retrieved price data
     - **401 Unauthorized:** Incorrect or missing API key
     - **403 Forbidden:** Monthly credit limit exceeded or rate limit exceeded.
+ 
+**Send Payment**
+- Endpoint: `/send_payment`
+- Method: POST 
+- Headers:
+  - **Content-Type:** application/json 
+- Request Body (json)
+  - **api_key:** The API key for which the payment is being made
+  - **token_amount:** The amount of Solana to send 	 
+- Response:
+  - **200 OK:** Successfully made a monthly payment and upgraded tier
+  - **400 Bad Request:** Payment amount is incorrect 
   
 **Prices**
 
@@ -98,19 +110,7 @@ The eventual aim is to expand the database to feature comprehensive coverage of 
     ```
     - **401 Unauthorized:** Authentication failed due to incorrect or missing credentials 
     - **400 Bad Request:** The request is missing the required api_key parameter
-    - **404 Not Found:** The specified API key was not found
-
-  **Send Payment**
-  - Endpoint: `/send_payment`
-  - Method: POST 
-  - Headers:
-  	- **Content-Type:** application/json 
-  - Request Body (json)
-  	- **api_key:** The API key for which the payment is being made
-   	- **token_amount:** The amount of Solana to send 	 
-  - Response:
-  	- **200 OK:** Successfully made a monthly payment and upgraded tier
-   	- **400 Bad Request:** Payment amount is incorrect 	   
+    - **404 Not Found:** The specified API key was not found	   
 
 ## Credit System 
 
