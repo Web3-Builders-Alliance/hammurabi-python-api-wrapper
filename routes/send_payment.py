@@ -57,11 +57,10 @@ def create_payment_address():
     )
 
     tx = VersionedTransaction(msg, [user_wallet_address])
-
-    client.send_transaction(tx)
     
     if token_amount == 0.05 or token_amount == 0.1:
         # Determine new tier and expiration date
+        client.send_transaction(tx)
         new_tier, expiration_date = determine_tier_and_expiration(token_amount)
         update_user_tier(api_key, new_tier, expiration_date)
         return jsonify({"payment_address": str(user_wallet_address.pubkey()), "amount_due": token_amount, "new_tier": new_tier}), 200
